@@ -1,84 +1,104 @@
 import {useState, useEffect} from 'react'
-import axios from 'axios'
-import { FaArrowRightLong } from "react-icons/fa6";
- import { FaEyeSlash } from "react-icons/fa";
- import { FaEye } from "react-icons/fa";
+import {FaEye, FaEyeSlash} from 'react-icons/fa'
+
 import './index.css'
+
 const Login = () => {
-    const [togglePassword, setTogglePassword] = useState(false)
-    const [userCredentials, setUserCredentials] = useState({loginUserName:'', loginPassword:''})
-    const [submitLoginDetail, setSubmitLoginDetail] = useState({username:'', password:''})
+  const [togglePassword, setTogglePassword] = useState(false)
+  const [submitLoginDetail, setSubmitLoginDetail] = useState(null)
+  const [userLoginDetail, setUserLoginDetail] = useState({
+    username: '',
+    password: '',
+  })
 
-    useEffect(()=>{
-        const fetchLoginDetail = async() => {
-            try {
-                const response = await axios.post(`https://apis.ccbp.in/login`, submitLoginDetail)
-                console.log(response)
-                
-            } catch (error) {
-                console.log('error')
-                
-            }
+  useEffect(() => {
+    const postLoginDetail = async () => {
+      if (submitLoginDetail) {
+        try {
+          const response = await fetch('https://apis.ccbp.in/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(submitLoginDetail),
+          })
+          console.log(response)
+        } catch (error) {
+          console.log(error)
         }
-        fetchLoginDetail();
-
-
-    },[submitLoginDetail])
-
-    const onChangeLoginInput = (event) => {
-        const {name, value} = event.target
-        setUserCredentials(preUserCreadentials => ({...preUserCreadentials, [name]:value}))
+      }
     }
+    postLoginDetail()
+  }, [submitLoginDetail])
 
+  const onClickTogglePassword = () => {
+    setTogglePassword(!togglePassword)
+  }
 
-    const onClickLoginSubmitButton = (event) => {
-        event.preventDefault()
-        setSubmitLoginDetail({
-            username: userCredentials.loginUserName,
-            password: userCredentials.loginPassword
-        })
-    }
-    return(
-        <div className='login-bg-container'>
-            <form onSubmit={onClickLoginSubmitButton} className='login-container'>
-                <img src='https://assets.ccbp.in/frontend/react-js/logo-img.png' alt='website-jobby-login-logo' className='login-img-logo'/>
-                <label htmlFor='username' className='login-input'>
-                    USERNAME :-
-                    <br/>
-                    <input name='loginUserName' 
-                    value={userCredentials.loginUserName} 
-                    onChange={onChangeLoginInput} 
-                    type="text" 
-                    placeholder='Username' 
-                    id='username' 
-                    className='style-login-input' />
-                    </label>  
-                    <label htmlFor='password' className='login-input'>
-                    PASSWORD :-
-                    <br/>
-                    <div className="password-login-container">
-                        <input name='loginPassword' 
-                        value={userCredentials.loginPassword} 
-                        onChange={onChangeLoginInput} 
-                        type={togglePassword ? 'text':'password'} 
-                        placeholder='Password' 
-                        id='password' 
-                        className='style-login-password-input' />
-                        <button 
-                        className="password-toggle-button" 
-                        onClick={()=>{setTogglePassword(preState=> !preState)}}>
-                            {togglePassword ?<FaEye className="password-icon"  />:<FaEyeSlash className="password-icon" /> }
-                        </button>
-                    </div>
-                    
-                    </label> 
-                    <button 
-                    type='submit' className='style-login-button'>
-                        Login<FaArrowRightLong className="login-right-arrow" />
-                    </button>
-            </form>
+  const onSubmitLoginDetails = event => {
+    event.preventDefault()
+    setSubmitLoginDetail(userLoginDetail)
+  }
+
+  const onChangeLoginDetail = event => {
+    const {name, value} = event.target
+    setUserLoginDetail({...userLoginDetail, [name]: value})
+  }
+
+  return (
+    <div className="login-bg-container">
+      <form onSubmit={onSubmitLoginDetails} className="login-form-container">
+        <div>
+          <img
+            src="https://assets.ccbp.in/frontend/react-js/logo-img.png"
+            alt="website logo"
+            className="job-login-logo-img"
+          />
         </div>
-    )
+
+        <label className="login-label" htmlFor="userName">
+          USERNAME :
+          <input
+            placeholder="Username"
+            className="login-username-input"
+            type="text"
+            id="userName"
+            name="username"
+            value={userLoginDetail.username}
+            onChange={onChangeLoginDetail}
+          />
+        </label>
+        <label className="login-label" htmlFor="passWord">
+          PASSWORD :
+          <div className="login-password-container">
+            <input
+              placeholder="Password"
+              className="login-password-input"
+              type={togglePassword ? 'text' : 'password'}
+              id="passWord"
+              name="password"
+              value={userLoginDetail.password}
+              onChange={onChangeLoginDetail}
+            />
+            <button
+              className="login-toggle-button"
+              type="button"
+              onClick={onClickTogglePassword}
+            >
+              {togglePassword ? (
+                <FaEyeSlash className="fa-eye" />
+              ) : (
+                <FaEye className="fa-eye" />
+              )}
+            </button>
+          </div>
+        </label>
+        <button type="submit" className="login-button">
+          Login
+        </button>
+      </form>
+    </div>
+  )
 }
 
 export default Login
